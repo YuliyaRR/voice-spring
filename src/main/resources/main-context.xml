@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="manager" class="groupwork.dao.db.orm.manager.Manager"/>
+
+    <bean id="genreService" class="groupwork.service.GenreService">
+        <constructor-arg index="0" ref="genreDao"/>
+    </bean>
+
+    <bean id="genreDao" class="groupwork.dao.db.GenreDaoDB">
+        <constructor-arg index="0" ref="manager"/>
+    </bean>
+
+    <bean id="singerService" class="groupwork.service.SingerService">
+        <constructor-arg index="0" ref="singerDao"/>
+    </bean>
+
+    <bean id="singerDao" class="groupwork.dao.db.SingerDaoDB">
+        <constructor-arg index="0" ref="manager"/>
+    </bean>
+
+    <bean id="voteService" class="groupwork.service.VoteService">
+        <constructor-arg index="0" ref="votingDao"/>
+        <constructor-arg index="1" ref="singerService"/>
+        <constructor-arg index="2" ref="genreService"/>
+    </bean>
+
+    <bean id="votingDao" class="groupwork.dao.db.VotingDaoDB">
+        <constructor-arg index="0" ref="manager"/>
+    </bean>
+
+    <bean id="statisticService" class="groupwork.service.StatisticsService">
+        <constructor-arg index="0" ref="voteService"/>
+        <constructor-arg index="1" ref="singerService"/>
+        <constructor-arg index="2" ref="genreService"/>
+    </bean>
+
+</beans>
