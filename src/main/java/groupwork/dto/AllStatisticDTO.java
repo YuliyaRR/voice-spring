@@ -1,33 +1,31 @@
 package groupwork.dto;
 
-import java.time.LocalDateTime;
-import java.util.Map;
+import java.util.List;
 
 public class AllStatisticDTO {
 
-    private final Map<SingerDTO, Integer> mapSingers;
-    private final Map<GenreDTO, Integer> mapGenres;
-    private final Map<LocalDateTime, String> mapUserInfo;
+    private final List<VoteCounterRaw<SingerDTOFromDBWithoutVersion>> singers;
+    private final List<VoteCounterRaw<GenreDTOFromDBWithoutVersion>> genres;
+    private final List<AboutUserDTOFromDB> aboutUsers;
 
-    public AllStatisticDTO(Map<SingerDTO, Integer> mapSingers,
-                           Map<GenreDTO, Integer> mapGenres,
-                           Map<LocalDateTime, String > mapUserInfo) {
-        this.mapSingers = mapSingers;
-        this.mapGenres = mapGenres;
-        this.mapUserInfo = mapUserInfo;
+    public AllStatisticDTO(List<VoteCounterRaw<SingerDTOFromDBWithoutVersion>> singers,
+                           List<VoteCounterRaw<GenreDTOFromDBWithoutVersion>> genres,
+                           List<AboutUserDTOFromDB> aboutUsers) {
+        this.singers = singers;
+        this.genres = genres;
+        this.aboutUsers = aboutUsers;
     }
 
-    public Map<SingerDTO, Integer> getMapSingers() {
-        return mapSingers;
+    public List<VoteCounterRaw<SingerDTOFromDBWithoutVersion>> getSingers() {
+        return singers;
     }
 
-    public Map<GenreDTO, Integer> getMapGenres() {
-        return mapGenres;
+    public List<VoteCounterRaw<GenreDTOFromDBWithoutVersion>> getGenres() {
+        return genres;
     }
 
-    public Map<LocalDateTime, String> getMapUserInfo() {
-        return mapUserInfo;
+    public List<AboutUserDTOFromDB> getAboutUsers() {
+        return aboutUsers;
     }
-
 
 }

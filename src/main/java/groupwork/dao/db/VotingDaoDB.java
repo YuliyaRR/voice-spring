@@ -2,7 +2,8 @@ package groupwork.dao.db;
 
 import groupwork.dao.api.IVotingDao;
 import groupwork.dao.db.orm.api.IManager;
-import groupwork.entity.SavedVoice;
+import groupwork.entity.VoiceEntity;
+import groupwork.exception.ConnectionDataBaseException;
 
 import javax.persistence.EntityManager;
 import java.util.List;
@@ -15,76 +16,41 @@ public class VotingDaoDB implements IVotingDao {
     }
 
 
-
     @Override
-    public List<SavedVoice> getVoiceList() {
+    public List<VoiceEntity> getVoiceList() {
         EntityManager entityManager = null;
-        List<SavedVoice> savedVoices;
         try {
             entityManager = manager.getEntityManager();
-
             entityManager.getTransaction().begin();
-            savedVoices  = entityManager.createQuery("FROM SavedVoice", SavedVoice.class).getResultList();
+            List<VoiceEntity> resultList = entityManager.createQuery("from VoiceEntity", VoiceEntity.class).getResultList();
             entityManager.getTransaction().commit();
-        } catch (Exception e) {
-            throw new RuntimeException("SQL exception", e.getCause());
-        } finally {
-            if (entityManager != null && entityManager.isOpen()) {
-                entityManager.close();
-            }
-        }
-        return savedVoices;
 
-    }
+            return resultList;
 
-//    @Override
-//    public Map<Long, Long> getIdAndKey() {
-//        return null;
-//    }
-
-    @Override
-    public void authorization(long id) {
-        EntityManager entityManager = null;
-        try {
-            entityManager = manager.getEntityManager();
-            entityManager.getTransaction().begin();
-
-            SavedVoice savedVoice = entityManager.find(SavedVoice.class, id);
-
-            if(savedVoice != null) {
-                savedVoice.setAuthorization(true);
-                entityManager.merge(savedVoice);
-                entityManager.getTransaction().commit();
-            } else {
-                entityManager.getTransaction().commit();
-                throw new NullPointerException("Update is not possible.");
-            }
         } catch (RuntimeException e) {
-            throw new RuntimeException("DataBase error", e);
+            throw new ConnectionDataBaseException("Database connection error", e);
         } finally {
             if(entityManager != null) {
                 entityManager.close();
             }
         }
+
     }
 
     @Override
-    public long save(SavedVoice voice) {
-
+    public void save(VoiceEntity voice) {
         EntityManager entityManager = null;
         try {
             entityManager = manager.getEntityManager();
             entityManager.getTransaction().begin();
             entityManager.persist(voice);
             entityManager.getTransaction().commit();
-            entityManager.close();
-        } catch (Exception e) {
-            throw new RuntimeException("SQL exception", e.getCause());
+        } catch (RuntimeException e) {
+            throw new ConnectionDataBaseException("Database connection error", e);
         } finally {
-            if (entityManager != null && entityManager.isOpen()) {
+            if(entityManager != null) {
                 entityManager.close();
             }
         }
-        return voice.getId();
     }
 }

@@ -2,7 +2,10 @@ package groupwork.service;
 
 import groupwork.dao.api.ISingerDao;
 import groupwork.dto.SingerDTO;
+import groupwork.dto.SingerDTOFromDB;
+import groupwork.dto.SingerDTOFromDBWithoutVersion;
 import groupwork.entity.SingerEntity;
+import groupwork.exception.InvalidInputServiceException;
 import groupwork.service.api.ISingerService;
 
 import java.util.ArrayList;
@@ -17,34 +20,34 @@ public class SingerService implements ISingerService {
     }
 
     @Override
-    public boolean checkNumber(long number) {
-        if (number == 0) {
-            throw new IllegalArgumentException("Введите номер исполнителя");
-        }
-        return this.dao.isContain(number);
-
+    public boolean isContain(Long id) {
+        return this.dao.isContain(id);
     }
 
     @Override
-    public List<SingerDTO> get() {
+    public List<SingerDTOFromDBWithoutVersion> get() {
         List<SingerEntity> singerList = dao.getSingerList();
-
-        List<SingerDTO>list = new ArrayList<>();
+        List<SingerDTOFromDBWithoutVersion>list = new ArrayList<>();
 
         for (SingerEntity singerEntity : singerList) {
-            list.add(new SingerDTO(singerEntity.getName(), singerEntity.getId()));
+            list.add(new SingerDTOFromDBWithoutVersion(singerEntity.getName(), singerEntity.getId()));
         }
 
         return list;
     }
 
     @Override
-    public void delete(long id) {
-//        long id = singerDTO.getId();
-        if(dao.isContain(id)){
-            dao.delete(new SingerEntity(id));
-        }else {
-            throw new IllegalArgumentException("Нет исполнителя для удаления с таким id");
+    public void delete(Long id, Long version) {
+        SingerEntity singerEntityDB = dao.get(id);
+
+        if(singerEntityDB != null) {
+            if(singerEntityDB.getVersion().equals(version)) {
+                dao.delete(new SingerEntity(id, version));
+            } else {
+                throw new InvalidInputServiceException("Singer's version is invalid");
+            }
+        } else {
+            throw new InvalidInputServiceException("Singer with this id was not found in the database");
         }
     }
 
@@ -54,28 +57,38 @@ public class SingerService implements ISingerService {
         if (name != null && !name.isBlank()) {
             dao.create(new SingerEntity(name));
         } else {
-            throw new IllegalArgumentException("Не введен исполнитель");
+            throw new InvalidInputServiceException("Singer name not specified");
         }
     }
 
     @Override
-    public void update(long id, SingerDTO singerDTO) {
+    public void update(Long id, Long version, SingerDTO singerDTO) {
         String singer = singerDTO.getName();
+
         if (singer == null || singer.isBlank()) {
-            throw new IllegalArgumentException("Не введено новое имя исполнителя");
+            throw new InvalidInputServiceException("Singer name not specified");
         }
 
-        if(dao.isContain(id)){
-            dao.update(new SingerEntity(id, singer));
+        SingerEntity singerEntityDB = dao.get(id);
+
+        if(singerEntityDB != null) {
+            if(singerEntityDB.getVersion().equals(version)) {
+                dao.update(new SingerEntity(id, singer, version));
+            } else {
+                throw new InvalidInputServiceException("Singer's version is invalid");
+            }
         } else {
-            throw new IllegalArgumentException("Нет исполнителя для обновления с таким id");
+            throw new InvalidInputServiceException("Singer with this id was not found in the database");
         }
     }
 
     @Override
-    public SingerDTO get(long id) {
+    public SingerDTOFromDB get(Long id) {
         SingerEntity singerEntity = this.dao.get(id);
-        return new SingerDTO(singerEntity.getName(), singerEntity.getId());
-
+        if(singerEntity != null) {
+            return new SingerDTOFromDB(singerEntity.getName(), singerEntity.getId(), singerEntity.getVersion());
+        } else {
+            throw new InvalidInputServiceException("Singer with this id was not found in the database");
+        }
     }
 }

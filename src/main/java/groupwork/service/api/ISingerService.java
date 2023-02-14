@@ -1,20 +1,22 @@
 package groupwork.service.api;
 
 import groupwork.dto.SingerDTO;
+import groupwork.dto.SingerDTOFromDB;
+import groupwork.dto.SingerDTOFromDBWithoutVersion;
 
 import java.util.List;
 
 public interface ISingerService {
 
-    boolean checkNumber(long number);
+    boolean isContain(Long id);
 
-    List<SingerDTO> get();
+    List<SingerDTOFromDBWithoutVersion> get();
 
-//    void delete(SingerDTO singerDTO);
-    void delete(long id);
+    void delete(Long id, Long version);
 
     void create(SingerDTO singerDTO);
 
-    void update(long id, SingerDTO singerDTO);
-    SingerDTO get(long id);
+    void update(Long id, Long version, SingerDTO singerDTO);
+
+    SingerDTOFromDB get(Long id);
 }

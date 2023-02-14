@@ -1,23 +1,17 @@
 package groupwork.service;
 
 import groupwork.dao.api.IVotingDao;
-import groupwork.dto.GenreDTO;
-import groupwork.dto.SavedVoiceDTO;
-import groupwork.dto.SingerDTO;
-import groupwork.dto.VoiceDTO;
+import groupwork.dto.*;
 import groupwork.entity.GenreEntity;
-import groupwork.entity.SavedVoice;
 import groupwork.entity.SingerEntity;
+import groupwork.entity.VoiceEntity;
+import groupwork.exception.InvalidInputServiceException;
 import groupwork.service.api.IGenreService;
-import groupwork.service.api.IMailService;
 import groupwork.service.api.ISingerService;
 import groupwork.service.api.IVotesService;
 
-import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.regex.Pattern;
+
 
 public class VoteService implements IVotesService {
     private final IVotingDao votingDao;
@@ -38,103 +32,82 @@ public class VoteService implements IVotesService {
     public void save(VoiceDTO voice) {
         check(voice);
 
-        SavedVoiceDTO savedVoiceDTO = new SavedVoiceDTO(voice);
+        Long singer = voice.getSinger();
+        Long[] genres = voice.getGenre();
+        String message = voice.getMessage();
 
-        String email = savedVoiceDTO.getMail();
-        LocalDateTime creationTime = savedVoiceDTO.getCreationTime();
-        String message = savedVoiceDTO.getMessage();
-        long key = savedVoiceDTO.getKey();
-        boolean auth = savedVoiceDTO.isAuthorization();
-        long  singer_id = savedVoiceDTO.getSinger();
-        SingerDTO s = singerService.get(singer_id);
-        SingerEntity singer = new SingerEntity(s.getId(), s.getName());
+        SingerDTOFromDB singerDTOFromDB = singerService.get(singer);
+        SingerEntity singerEntity = new SingerEntity(singer, singerDTOFromDB.getVersion());
 
-        List<GenreEntity> genres = new ArrayList<>();
-        for (long genre_id : savedVoiceDTO.getGenre()) {
-            GenreDTO genreDTO = genreService.get(genre_id);
-            genres.add(new GenreEntity(genreDTO.getId(), genreDTO.getName()));
+        List<GenreEntity>listGenre = new ArrayList<>();
+        for (Long genre : genres) {
+            listGenre.add(new GenreEntity(genre, genreService.get(genre).getVersion()));
         }
 
-        SavedVoice savedVoice = new SavedVoice(singer, genres, message, email, creationTime, key, auth);
-        long id = votingDao.save(savedVoice);
+        VoiceEntity voiceEntity = new VoiceEntity(singerEntity, listGenre, message);
 
+        votingDao.save(voiceEntity);
 
     }
 
     @Override
-    public Map<Long, Long> getIdAndKey() {
-        Map<Long, Long> map = new HashMap<>();
-        List<SavedVoice> savedVoices = votingDao.getVoiceList();
-        for (SavedVoice savedVoice : savedVoices) {
-            map.put(savedVoice.getId(), savedVoice.getKey());
-        }
-        return map;
-    }
+    public List<VoiceDTOFromDB> get() {
+        List<VoiceDTOFromDB> result = new ArrayList<>();
+        List<VoiceEntity> voiceList = votingDao.getVoiceList();
+        VoiceDTOFromDB.VoiceDTOFromDBBuilder builder = VoiceDTOFromDB.VoiceDTOFromDBBuilder.create();
 
-    @Override
-    public void authorization(long id) {
-        votingDao.authorization(id);
-    }
+        for (VoiceEntity voiceEntity : voiceList) {
+            SingerEntity singer = voiceEntity.getSinger();
+            builder.setSinger(singer.getId());
 
-    @Override
-    public List<SavedVoiceDTO> get() {
-        List<SavedVoiceDTO> savedVoiceDTOS = new ArrayList<>();
-        List<SavedVoice> all = votingDao.getVoiceList();
-        for (SavedVoice voice : all) {
-            String email = voice.getMail();
-            LocalDateTime creationTime = voice.getDt_create();
-            String message = voice.getAbout();
-            Long id_singer = voice.getSinger().getId();
-
-            List<GenreEntity> genre = voice.getGenres();
-            long[] genres = new long[genre.size()];
-            for (int i = 0; i < genres.length; i++) {
-                genres[i] = genre.get(i).getId();
+            List<GenreEntity> genres = voiceEntity.getGenres();
+            for (GenreEntity genre : genres) {
+                builder.addGenre(genre.getId());
             }
 
-            VoiceDTO voiceDTO = new VoiceDTO(id_singer, genres, message, email);
-            savedVoiceDTOS.add(new SavedVoiceDTO(voiceDTO, creationTime));
+            VoiceDTOFromDB voiceDTOFromDB = builder
+                    .setMessage(voiceEntity.getMessage())
+                    .setDtCreate(voiceEntity.getTime())
+                    .build();
+
+            result.add(voiceDTOFromDB);
         }
-        return savedVoiceDTOS;
+
+        return result;
     }
 
     private void check(VoiceDTO voice) {
-        long singer = voice.getSinger();
-        if (!singerService.checkNumber(voice.getSinger())) {
-            throw new IllegalArgumentException("Артист №" + singer + " отсутствует в списке выбора");
+        Long singer = voice.getSinger();
+        if (!singerService.isContain(singer)) {
+            throw new InvalidInputServiceException("Singer №" + singer + " is not on the list");
         }
 
-        long[] genres = voice.getGenre();
+        Long[] genres = voice.getGenre();
 
         Set<Long> setGenre = new HashSet<>();
 
-        for (long val : genres) {
+        for (Long val : genres) {
             setGenre.add(val);
         }
 
         if (setGenre.size() < 3 || setGenre.size() > 5) {
-            throw new IllegalArgumentException("Неверное количество жанров, должно быть от 3 до 5");
+            throw new InvalidInputServiceException("Wrong number of genres, need from 3 to 5");
         }
 
         if (setGenre.size() != genres.length) {
-            throw new IllegalArgumentException("Переданные жанры содержат дубли");
+            throw new InvalidInputServiceException("Received genres contain duplicates");
         }
 
         for (Long genre : setGenre) {
-            if (!genreService.check(genre)) {
-                throw new IllegalArgumentException("Введенный жанр №" + genre + " не содержится в списке");
+            if (!genreService.isContain(genre)) {
+                throw new InvalidInputServiceException("Genre №" + genre + " is not on the list");
             }
         }
 
         String aboutMe = voice.getMessage();
         if (aboutMe == null || aboutMe.isBlank()) {
-            throw new IllegalArgumentException("Нужно ввести информацию о себе");
+            throw new InvalidInputServiceException("You need to enter information about yourself");
         }
 
-        String email = voice.getMail();
-       /* Pattern pattern = Pattern.compile("^[a-zA-Z0-9!#$%&'*+/=?^_`{|},~\\-]+(?:\\\\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~\\-]+)*@+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?+\\.+[a-zA-Z]*$");
-        if (!pattern.matcher(email).matches()) {
-            throw new IllegalArgumentException("E-MAIL IS NOT CORRECT");
-        }*/
     }
 }

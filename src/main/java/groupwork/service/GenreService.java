@@ -2,7 +2,10 @@ package groupwork.service;
 
 import groupwork.dao.api.IGenreDao;
 import groupwork.dto.GenreDTO;
+import groupwork.dto.GenreDTOFromDB;
+import groupwork.dto.GenreDTOFromDBWithoutVersion;
 import groupwork.entity.GenreEntity;
+import groupwork.exception.InvalidInputServiceException;
 import groupwork.service.api.IGenreService;
 
 import java.util.ArrayList;
@@ -17,36 +20,33 @@ public class GenreService implements IGenreService {
     }
 
     @Override
-    public boolean check(long number) {
-        if (number == 0) {
-            throw new IllegalArgumentException("Введите id жанра");
-        }
-        return this.dao.isContain(number);
+    public boolean isContain(Long id) {
+        return this.dao.isContain(id);
     }
 
     @Override
-    public List<GenreDTO> get() {
-        List<GenreEntity> genreList = dao.getGenreList();
-
-        List<GenreDTO> list = new ArrayList<>();
+    public List<GenreDTOFromDBWithoutVersion> get() {
+        List<GenreEntity> genreList = dao.getAll();
+        List<GenreDTOFromDBWithoutVersion> list = new ArrayList<>();
 
         for (GenreEntity genreEntity : genreList) {
-            list.add(new GenreDTO(genreEntity.getName(), genreEntity.getId()));
+            list.add(new GenreDTOFromDBWithoutVersion(genreEntity.getName(), genreEntity.getId()));
         }
 
         return list;
     }
 
     @Override
-    public void delete(long id) {
-//        long id = genreDTO.getId();
-        if (id == 0) {
-            throw new IllegalArgumentException("Введите номер жанра");
-        }
-        if (dao.isContain(id)) {
-            dao.delete(new GenreEntity(id));
+    public void delete(Long id, Long version) {
+        GenreEntity genreEntityDB = dao.get(id);
+        if (genreEntityDB != null) {
+            if (genreEntityDB.getVersion().equals(version)){
+                dao.delete(new GenreEntity(id, version));
+            } else {
+                throw new InvalidInputServiceException("This version genre was changed or was deleted yet");
+            }
         } else {
-            throw new IllegalArgumentException("Нет жанра для удаления с таким id");
+            throw new InvalidInputServiceException("Genre with this id was not found in the database");
         }
     }
 
@@ -56,33 +56,38 @@ public class GenreService implements IGenreService {
         if (name != null && !name.isBlank()) {
             dao.create(new GenreEntity(name));
         } else {
-            throw new IllegalArgumentException("Не введен исполнитель");
+            throw new InvalidInputServiceException("Genre name not specified");
         }
     }
 
     @Override
-    public void update(long id, GenreDTO genreDTO) {
+    public void update(Long id, Long version, GenreDTO genreDTO) {
         String genre = genreDTO.getName();
 
         if (genre == null || genre.isBlank()) {
-            throw new IllegalArgumentException("Не введен жанр");
+            throw new InvalidInputServiceException("Genre name not specified");
         }
 
-        if (id == 0) {
-            throw new IllegalArgumentException("Введите id жанра");
-        }
-
-        if (dao.isContain(id)) {
-            GenreEntity genreEntity = new GenreEntity(id, genre);
-            dao.update(genreEntity);
+        GenreEntity entityDB = dao.get(id);
+        if(entityDB != null) {
+            if(entityDB.getVersion().equals(version)) {
+                GenreEntity genreEntity = new GenreEntity(id, version, genre);
+                dao.update(genreEntity);
+            } else {
+                throw new InvalidInputServiceException("This version genre was changed or was deleted yet");
+            }
         } else {
-            throw new IllegalArgumentException("Нет жанра для обновления с таким id");
+            throw new InvalidInputServiceException("Genre with this id was not found in the database");
         }
     }
 
     @Override
-    public GenreDTO get(long id) {
+    public GenreDTOFromDB get(Long id) {
         GenreEntity genreEntity = this.dao.get(id);
-        return new GenreDTO(genreEntity.getName(), genreEntity.getId());
+        if(genreEntity != null) {
+            return new GenreDTOFromDB(genreEntity.getName(), genreEntity.getId(), genreEntity.getVersion());
+        } else {
+            throw new InvalidInputServiceException("Genre with this id was not found in the database");
+        }
     }
 }

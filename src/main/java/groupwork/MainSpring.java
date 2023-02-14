@@ -7,7 +7,7 @@ import groupwork.dao.db.orm.manager.Manager;
 import groupwork.dto.*;
 import groupwork.service.GenreService;
 import groupwork.service.SingerService;
-import groupwork.service.StatisticsService;
+
 import groupwork.service.VoteService;
 import groupwork.service.api.IGenreService;
 import groupwork.service.api.ISingerService;
@@ -38,7 +38,7 @@ public class MainSpring {
       //  VotingDaoDB votingDao = context.getBean("votingDao", VotingDaoDB.class);
         IVotesService voteService = context.getBean("voteService", VoteService.class);
 
-        IStatisticsService statisticService = context.getBean("statisticService", StatisticsService.class);
+      /*  IStatisticsService statisticService = context.getBean("statisticService", StatisticsService.class);
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         System.out.println("Список исполнителей для голосования");
@@ -136,7 +136,7 @@ public class MainSpring {
 
         long idGenreDelete = Long.parseLong(reader.readLine());
 
-        genreService.delete(idGenreDelete);
+        genreService.delete(idGenreDelete);*/
 
     }
 }

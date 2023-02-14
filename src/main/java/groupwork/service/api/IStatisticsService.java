@@ -1,9 +1,17 @@
 package groupwork.service.api;
 
-import groupwork.dto.AllStatisticDTO;
+import groupwork.dto.*;
+
+import java.util.List;
 
 public interface IStatisticsService {
 
-    AllStatisticDTO getAllSort();
+    AllStatisticDTO getStatistic();
+
+    List<VoteCounterRaw<SingerDTOFromDBWithoutVersion>> getSortSinger();
+
+    List<VoteCounterRaw<GenreDTOFromDBWithoutVersion>> getSortGenre();
+
+    List<AboutUserDTOFromDB> getSortAbout();
 
 }

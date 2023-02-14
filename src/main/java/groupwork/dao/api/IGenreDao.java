@@ -5,15 +5,15 @@ import groupwork.entity.GenreEntity;
 import java.util.List;
 
 public interface IGenreDao {
-//исправить на entity
-    List<GenreEntity> getGenreList();
 
-    boolean isContain(long id);
+    List<GenreEntity> getAll();
+
+    boolean isContain(Long id);
 
     void delete(GenreEntity genreEntity);
 
     void create(GenreEntity genreEntity);
 
-    void update( GenreEntity genreEntity);
-    GenreEntity get(long id);
+    void update(GenreEntity genreEntity);
+    GenreEntity get(Long id);
 }

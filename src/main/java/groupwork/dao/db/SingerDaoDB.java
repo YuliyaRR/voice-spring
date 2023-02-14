@@ -3,8 +3,14 @@ package groupwork.dao.db;
 import groupwork.dao.api.ISingerDao;
 import groupwork.dao.db.orm.api.IManager;
 import groupwork.entity.SingerEntity;
+import groupwork.exception.ConnectionDataBaseException;
+import groupwork.exception.NotFoundDataBaseException;
 
 import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.util.List;
 
 public class SingerDaoDB implements ISingerDao {
@@ -16,26 +22,25 @@ public class SingerDaoDB implements ISingerDao {
     @Override
     public List<SingerEntity> getSingerList() {
         EntityManager entityManager = null;
-        List<SingerEntity> resultList;
         try {
             entityManager = manager.getEntityManager();
             entityManager.getTransaction().begin();
-            resultList = entityManager.createQuery("from SingerEntity", SingerEntity.class).getResultList();
+            List<SingerEntity> resultList = entityManager.createQuery("from SingerEntity", SingerEntity.class).getResultList();
             entityManager.getTransaction().commit();
 
+            return resultList;
+
         } catch (RuntimeException e) {
-            throw new RuntimeException("DataBase error", e);
+            throw new ConnectionDataBaseException("Database connection error", e);
         } finally {
             if(entityManager != null) {
                 entityManager.close();
             }
         }
-        return resultList;
     }
 
     @Override
-    public boolean isContain(long id) {
-        boolean result = false;
+    public boolean isContain(Long id) {
         EntityManager entityManager = null;
         try {
             entityManager = manager.getEntityManager();
@@ -43,38 +48,39 @@ public class SingerDaoDB implements ISingerDao {
             SingerEntity singerEntity = entityManager.find(SingerEntity.class, id);
             entityManager.getTransaction().commit();
 
-            if(singerEntity != null) {
-                result = true;
-            }
+            return singerEntity != null;
 
         } catch (RuntimeException e) {
-            throw new RuntimeException("DataBase error", e);
+            throw new ConnectionDataBaseException("Database connection error", e);
         } finally {
             if(entityManager != null) {
                 entityManager.close();
             }
         }
-
-        return result;
     }
 
     @Override
     public void delete(SingerEntity singerEntity) {
-        long id = singerEntity.getId();
+        Long id = singerEntity.getId();
+        Long version = singerEntity.getVersion();
         EntityManager entityManager = null;
         try {
             entityManager = manager.getEntityManager();
             entityManager.getTransaction().begin();
-            singerEntity = entityManager.find(SingerEntity.class, id);
-            if(singerEntity != null) {
-                entityManager.remove(singerEntity);
+            SingerEntity singerEntityDB = entityManager.find(SingerEntity.class, id);
+            if(singerEntityDB != null && singerEntityDB.getVersion().equals(version)) {
+                entityManager.remove(singerEntityDB);
                 entityManager.getTransaction().commit();
             } else {
-                entityManager.getTransaction().commit();
+                entityManager.getTransaction().rollback();
                 throw new NullPointerException("Delete is not possible. The singer wasn't found in the database");
             }
         } catch (RuntimeException e) {
-            throw new RuntimeException("DataBase error", e);
+            if(e instanceof NullPointerException) {
+                throw new NotFoundDataBaseException(e.getMessage());
+            } else {
+                throw new ConnectionDataBaseException("Database connection error", e);
+            }
         } finally {
             if(entityManager != null) {
                 entityManager.close();
@@ -91,7 +97,7 @@ public class SingerDaoDB implements ISingerDao {
             entityManager.persist(singerEntity);
             entityManager.getTransaction().commit();
         } catch (RuntimeException e) {
-            throw new RuntimeException("DataBase error", e);
+            throw new ConnectionDataBaseException("Database connection error", e);
         } finally {
             if(entityManager != null) {
                 entityManager.close();
@@ -101,7 +107,8 @@ public class SingerDaoDB implements ISingerDao {
 
     @Override
     public void update(SingerEntity singerEntity) {
-        long id = singerEntity.getId();
+        Long id = singerEntity.getId();
+        Long version = singerEntity.getVersion();
         EntityManager entityManager = null;
         try {
             entityManager = manager.getEntityManager();
@@ -109,15 +116,19 @@ public class SingerDaoDB implements ISingerDao {
 
             SingerEntity singerEntityDB = entityManager.find(SingerEntity.class, id);
 
-            if(singerEntityDB != null) {
+            if (singerEntityDB != null && singerEntityDB.getVersion().equals(version)) {
                 entityManager.merge(singerEntity);
                 entityManager.getTransaction().commit();
             } else {
-                entityManager.getTransaction().commit();
+                entityManager.getTransaction().rollback();
                 throw new NullPointerException("Update is not possible. The singer wasn't found in the database");
             }
         } catch (RuntimeException e) {
-            throw new RuntimeException("DataBase error", e);
+            if(e instanceof NullPointerException) {
+                throw new NotFoundDataBaseException(e.getMessage());
+            } else {
+                throw new ConnectionDataBaseException("Database connection error", e);
+            }
         } finally {
             if(entityManager != null) {
                 entityManager.close();
@@ -125,26 +136,33 @@ public class SingerDaoDB implements ISingerDao {
         }
     }
     @Override
-    public SingerEntity get(long id) {
+    public SingerEntity get(Long id) {
         EntityManager entityManager = null;
-        SingerEntity singerEntity;
         try {
             entityManager = manager.getEntityManager();
             entityManager.getTransaction().begin();
-            singerEntity = entityManager.find(SingerEntity.class, id);
+            SingerEntity singerEntity = entityManager.find(SingerEntity.class, id);
             entityManager.getTransaction().commit();
 
-            if(singerEntity == null){
-                throw new NullPointerException("The singer wasn't found in the database");
+            if(singerEntity != null){
+
+                return singerEntity;
+
+            } else {
+                throw new NotFoundDataBaseException("The singer wasn't found in the database");
             }
 
         } catch (RuntimeException e) {
-            throw new RuntimeException("Ошибка БД", e);
+            if(e instanceof NullPointerException) {
+                throw new NotFoundDataBaseException(e.getMessage());
+            } else {
+                throw new ConnectionDataBaseException("Database connection error", e);
+            }
+
         } finally {
             if(entityManager != null) {
                 entityManager.close();
             }
         }
-        return singerEntity;
     }
 }

@@ -4,12 +4,6 @@ import java.util.Objects;
 
 public class SingerDTO {
     private String name;
-    private long id;
-
-    public SingerDTO(String name, long id) {
-        this.name = name;
-        this.id = id;
-    }
 
     public SingerDTO(String name) {
         this.name = name;
@@ -26,29 +20,21 @@ public class SingerDTO {
         this.name = name;
     }
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SingerDTO singerDTO = (SingerDTO) o;
-        return id == singerDTO.id && Objects.equals(name, singerDTO.name);
+        return Objects.equals(name, singerDTO.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, id);
+        return Objects.hash(name);
     }
 
     @Override
     public String toString() {
-        return "id = " + id + ",  name = " + name;
+        return "name = " + name;
     }
 }
