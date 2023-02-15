@@ -1,6 +1,6 @@
-package groupwork.dao.db.orm.manager;
+package groupwork.dao.orm.manager;
 
-import groupwork.dao.db.orm.api.IManager;
+import groupwork.dao.orm.api.IManager;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;

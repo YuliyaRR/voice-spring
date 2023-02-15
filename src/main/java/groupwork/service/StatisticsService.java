@@ -25,14 +25,14 @@ public class StatisticsService implements IStatisticsService {
         this.genreService = genreService;
     }
 
-    public List<VoteCounterRaw<SingerDTOFromDBWithoutVersion>> getSortSinger(){
-        List<VoteCounterRaw<SingerDTOFromDBWithoutVersion>> result = singerService.get().stream()
+    public List<VoteCounterRaw<SingerDTOBrief>> getSortSinger(){
+        List<VoteCounterRaw<SingerDTOBrief>> result = singerService.get().stream()
                 .map(VoteCounterRaw::new)
                 .collect(Collectors.toList());
 
         for (VoiceDTOFromDB voice : voteService.get()) {
             Long singerID = voice.getSingerID();
-            for (VoteCounterRaw<SingerDTOFromDBWithoutVersion> singer : result) {
+            for (VoteCounterRaw<SingerDTOBrief> singer : result) {
                 if(singer.getItem().getId().equals(singerID)) {
                     singer.addVoice();
                     break;
@@ -45,15 +45,15 @@ public class StatisticsService implements IStatisticsService {
         return result;
     }
 
-    public List<VoteCounterRaw<GenreDTOFromDBWithoutVersion>> getSortGenre(){
-        List<VoteCounterRaw<GenreDTOFromDBWithoutVersion>> result = genreService.get().stream()
+    public List<VoteCounterRaw<GenreDTOBrief>> getSortGenre(){
+        List<VoteCounterRaw<GenreDTOBrief>> result = genreService.get().stream()
                 .map(VoteCounterRaw::new)
                 .collect(Collectors.toList());
 
         for (VoiceDTOFromDB voice : voteService.get()) {
             List<Long> genres = voice.getGenresID();
 
-            for (VoteCounterRaw<GenreDTOFromDBWithoutVersion> resultGenre : result) {
+            for (VoteCounterRaw<GenreDTOBrief> resultGenre : result) {
                 for (Long genre : genres) {
                     if (resultGenre.getItem().getId().equals(genre)){
                         resultGenre.addVoice();
@@ -79,11 +79,11 @@ public class StatisticsService implements IStatisticsService {
     public AllStatisticDTO getStatistic() {
         List<VoiceDTOFromDB> voiceList = voteService.get();
 
-        List<VoteCounterRaw<SingerDTOFromDBWithoutVersion>> singerList = singerService.get().stream()
+        List<VoteCounterRaw<SingerDTOBrief>> singerList = singerService.get().stream()
                 .map(VoteCounterRaw::new)
                 .collect(Collectors.toList());
 
-        List<VoteCounterRaw<GenreDTOFromDBWithoutVersion>> genreList = genreService.get().stream()
+        List<VoteCounterRaw<GenreDTOBrief>> genreList = genreService.get().stream()
                 .map(VoteCounterRaw::new)
                 .collect(Collectors.toList());
 
@@ -93,14 +93,14 @@ public class StatisticsService implements IStatisticsService {
             Long singerID = voice.getSingerID();
             List<Long> genresID = voice.getGenresID();
 
-            for (VoteCounterRaw<SingerDTOFromDBWithoutVersion> singer : singerList) {
+            for (VoteCounterRaw<SingerDTOBrief> singer : singerList) {
                 if(singer.getItem().getId().equals(singerID)){
                     singer.addVoice();
                     break;
                 }
             }
 
-            for (VoteCounterRaw<GenreDTOFromDBWithoutVersion> genre : genreList) {
+            for (VoteCounterRaw<GenreDTOBrief> genre : genreList) {
                 for (Long genreID : genresID) {
                     if(genre.getItem().getId().equals(genreID)){
                         genre.addVoice();

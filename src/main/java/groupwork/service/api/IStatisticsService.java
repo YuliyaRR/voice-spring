@@ -8,9 +8,9 @@ public interface IStatisticsService {
 
     AllStatisticDTO getStatistic();
 
-    List<VoteCounterRaw<SingerDTOFromDBWithoutVersion>> getSortSinger();
+    List<VoteCounterRaw<SingerDTOBrief>> getSortSinger();
 
-    List<VoteCounterRaw<GenreDTOFromDBWithoutVersion>> getSortGenre();
+    List<VoteCounterRaw<GenreDTOBrief>> getSortGenre();
 
     List<AboutUserDTOFromDB> getSortAbout();
 

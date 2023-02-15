@@ -1,8 +1,8 @@
 package groupwork.service.api;
 
 import groupwork.dto.GenreDTO;
-import groupwork.dto.GenreDTOFromDB;
-import groupwork.dto.GenreDTOFromDBWithoutVersion;
+import groupwork.dto.GenreDTOFull;
+import groupwork.dto.GenreDTOBrief;
 
 import java.util.List;
 
@@ -10,7 +10,7 @@ public interface IGenreService {
 
     boolean isContain(Long id);
 
-    List<GenreDTOFromDBWithoutVersion> get();
+    List<GenreDTOBrief> get();
 
     void delete(Long id, Long version);
 
@@ -18,6 +18,6 @@ public interface IGenreService {
 
     void update(Long id, Long version, GenreDTO genreDTO);
 
-    GenreDTOFromDB get(Long id);
+    GenreDTOFull get(Long id);
 
 }

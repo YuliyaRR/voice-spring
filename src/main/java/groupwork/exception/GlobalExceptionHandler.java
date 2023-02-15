@@ -1,9 +1,6 @@
 package groupwork.exception;
 
 import groupwork.dto.ResponseError;
-import groupwork.exception.ConnectionDataBaseException;
-import groupwork.exception.InvalidInputServiceException;
-import groupwork.exception.NotFoundDataBaseException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;

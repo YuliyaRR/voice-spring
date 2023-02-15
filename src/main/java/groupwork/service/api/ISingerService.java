@@ -1,8 +1,8 @@
 package groupwork.service.api;
 
 import groupwork.dto.SingerDTO;
-import groupwork.dto.SingerDTOFromDB;
-import groupwork.dto.SingerDTOFromDBWithoutVersion;
+import groupwork.dto.SingerDTOFull;
+import groupwork.dto.SingerDTOBrief;
 
 import java.util.List;
 
@@ -10,7 +10,7 @@ public interface ISingerService {
 
     boolean isContain(Long id);
 
-    List<SingerDTOFromDBWithoutVersion> get();
+    List<SingerDTOBrief> get();
 
     void delete(Long id, Long version);
 
@@ -18,5 +18,5 @@ public interface ISingerService {
 
     void update(Long id, Long version, SingerDTO singerDTO);
 
-    SingerDTOFromDB get(Long id);
+    SingerDTOFull get(Long id);
 }

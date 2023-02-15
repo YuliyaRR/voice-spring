@@ -36,8 +36,8 @@ public class VoteService implements IVotesService {
         Long[] genres = voice.getGenre();
         String message = voice.getMessage();
 
-        SingerDTOFromDB singerDTOFromDB = singerService.get(singer);
-        SingerEntity singerEntity = new SingerEntity(singer, singerDTOFromDB.getVersion());
+        SingerDTOFull singerDTOFull = singerService.get(singer);
+        SingerEntity singerEntity = new SingerEntity(singer, singerDTOFull.getVersion());
 
         List<GenreEntity>listGenre = new ArrayList<>();
         for (Long genre : genres) {
@@ -53,7 +53,7 @@ public class VoteService implements IVotesService {
     @Override
     public List<VoiceDTOFromDB> get() {
         List<VoiceDTOFromDB> result = new ArrayList<>();
-        List<VoiceEntity> voiceList = votingDao.getVoiceList();
+        List<VoiceEntity> voiceList = votingDao.getVoices();
         VoiceDTOFromDB.VoiceDTOFromDBBuilder builder = VoiceDTOFromDB.VoiceDTOFromDBBuilder.create();
 
         for (VoiceEntity voiceEntity : voiceList) {
@@ -67,7 +67,7 @@ public class VoteService implements IVotesService {
 
             VoiceDTOFromDB voiceDTOFromDB = builder
                     .setMessage(voiceEntity.getMessage())
-                    .setDtCreate(voiceEntity.getTime())
+                    .setDtCreate(voiceEntity.getDtCreate())
                     .build();
 
             result.add(voiceDTOFromDB);

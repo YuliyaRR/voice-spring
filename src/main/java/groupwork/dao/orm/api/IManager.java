@@ -1,4 +1,4 @@
-package groupwork.dao.db.orm.api;
+package groupwork.dao.orm.api;
 
 import javax.persistence.EntityManager;
 

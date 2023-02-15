@@ -2,8 +2,8 @@ package groupwork.service;
 
 import groupwork.dao.api.ISingerDao;
 import groupwork.dto.SingerDTO;
-import groupwork.dto.SingerDTOFromDB;
-import groupwork.dto.SingerDTOFromDBWithoutVersion;
+import groupwork.dto.SingerDTOFull;
+import groupwork.dto.SingerDTOBrief;
 import groupwork.entity.SingerEntity;
 import groupwork.exception.InvalidInputServiceException;
 import groupwork.service.api.ISingerService;
@@ -25,12 +25,12 @@ public class SingerService implements ISingerService {
     }
 
     @Override
-    public List<SingerDTOFromDBWithoutVersion> get() {
-        List<SingerEntity> singerList = dao.getSingerList();
-        List<SingerDTOFromDBWithoutVersion>list = new ArrayList<>();
+    public List<SingerDTOBrief> get() {
+        List<SingerEntity> singerList = dao.getAll();
+        List<SingerDTOBrief>list = new ArrayList<>();
 
         for (SingerEntity singerEntity : singerList) {
-            list.add(new SingerDTOFromDBWithoutVersion(singerEntity.getName(), singerEntity.getId()));
+            list.add(new SingerDTOBrief(singerEntity.getName(), singerEntity.getId()));
         }
 
         return list;
@@ -73,7 +73,8 @@ public class SingerService implements ISingerService {
 
         if(singerEntityDB != null) {
             if(singerEntityDB.getVersion().equals(version)) {
-                dao.update(new SingerEntity(id, singer, version));
+                singerEntityDB.setName(singer);
+                dao.update(singerEntityDB);
             } else {
                 throw new InvalidInputServiceException("Singer's version is invalid");
             }
@@ -83,10 +84,10 @@ public class SingerService implements ISingerService {
     }
 
     @Override
-    public SingerDTOFromDB get(Long id) {
+    public SingerDTOFull get(Long id) {
         SingerEntity singerEntity = this.dao.get(id);
         if(singerEntity != null) {
-            return new SingerDTOFromDB(singerEntity.getName(), singerEntity.getId(), singerEntity.getVersion());
+            return new SingerDTOFull(singerEntity.getName(), singerEntity.getId(), singerEntity.getVersion());
         } else {
             throw new InvalidInputServiceException("Singer with this id was not found in the database");
         }

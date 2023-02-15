@@ -2,8 +2,8 @@ package groupwork.service;
 
 import groupwork.dao.api.IGenreDao;
 import groupwork.dto.GenreDTO;
-import groupwork.dto.GenreDTOFromDB;
-import groupwork.dto.GenreDTOFromDBWithoutVersion;
+import groupwork.dto.GenreDTOFull;
+import groupwork.dto.GenreDTOBrief;
 import groupwork.entity.GenreEntity;
 import groupwork.exception.InvalidInputServiceException;
 import groupwork.service.api.IGenreService;
@@ -25,12 +25,12 @@ public class GenreService implements IGenreService {
     }
 
     @Override
-    public List<GenreDTOFromDBWithoutVersion> get() {
+    public List<GenreDTOBrief> get() {
         List<GenreEntity> genreList = dao.getAll();
-        List<GenreDTOFromDBWithoutVersion> list = new ArrayList<>();
+        List<GenreDTOBrief> list = new ArrayList<>();
 
         for (GenreEntity genreEntity : genreList) {
-            list.add(new GenreDTOFromDBWithoutVersion(genreEntity.getName(), genreEntity.getId()));
+            list.add(new GenreDTOBrief(genreEntity.getName(), genreEntity.getId()));
         }
 
         return list;
@@ -40,8 +40,8 @@ public class GenreService implements IGenreService {
     public void delete(Long id, Long version) {
         GenreEntity genreEntityDB = dao.get(id);
         if (genreEntityDB != null) {
-            if (genreEntityDB.getVersion().equals(version)){
-                dao.delete(new GenreEntity(id, version));
+            if (genreEntityDB.getVersion().equals(version)) {
+                dao.delete(genreEntityDB);
             } else {
                 throw new InvalidInputServiceException("This version genre was changed or was deleted yet");
             }
@@ -56,7 +56,7 @@ public class GenreService implements IGenreService {
         if (name != null && !name.isBlank()) {
             dao.create(new GenreEntity(name));
         } else {
-            throw new InvalidInputServiceException("Genre name not specified");
+            throw new InvalidInputServiceException("Genre name isn't specified");
         }
     }
 
@@ -65,14 +65,15 @@ public class GenreService implements IGenreService {
         String genre = genreDTO.getName();
 
         if (genre == null || genre.isBlank()) {
-            throw new InvalidInputServiceException("Genre name not specified");
+            throw new InvalidInputServiceException("Genre name isn't specified");
         }
 
         GenreEntity entityDB = dao.get(id);
+
         if(entityDB != null) {
             if(entityDB.getVersion().equals(version)) {
-                GenreEntity genreEntity = new GenreEntity(id, version, genre);
-                dao.update(genreEntity);
+                entityDB.setName(genre);
+                dao.update(entityDB);
             } else {
                 throw new InvalidInputServiceException("This version genre was changed or was deleted yet");
             }
@@ -82,10 +83,10 @@ public class GenreService implements IGenreService {
     }
 
     @Override
-    public GenreDTOFromDB get(Long id) {
+    public GenreDTOFull get(Long id) {
         GenreEntity genreEntity = this.dao.get(id);
         if(genreEntity != null) {
-            return new GenreDTOFromDB(genreEntity.getName(), genreEntity.getId(), genreEntity.getVersion());
+            return new GenreDTOFull(genreEntity.getName(), genreEntity.getId(), genreEntity.getVersion());
         } else {
             throw new InvalidInputServiceException("Genre with this id was not found in the database");
         }
