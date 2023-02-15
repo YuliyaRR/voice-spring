@@ -21,12 +21,6 @@ public class GenreEntity {
     public GenreEntity() {
     }
 
-    public GenreEntity(Long id, Long version, String name) {
-        this.id = id;
-        this.version = version;
-        this.name = name;
-    }
-
     public GenreEntity(String name) {
         this.name = name;
     }
@@ -46,5 +40,9 @@ public class GenreEntity {
 
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

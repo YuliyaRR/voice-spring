@@ -19,12 +19,6 @@ public class SingerEntity {
     public SingerEntity() {
     }
 
-    public SingerEntity(Long id, String name, Long version) {
-        this.id = id;
-        this.name = name;
-        this.version = version;
-    }
-
     public SingerEntity(String name) {
         this.name = name;
     }
@@ -44,5 +38,9 @@ public class SingerEntity {
 
     public Long getVersion() {
         return version;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
