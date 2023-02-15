@@ -18,11 +18,7 @@ public class UserAnswerController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    protected void saveVoice(@RequestBody VoiceDTO voice) {
+    public void saveVoice(@RequestBody VoiceDTO voice) {
         voteService.save(voice);
-
-            /*String contextPath = req.getContextPath();
-            resp.sendRedirect(contextPath + "/result");*/
-
     }
 }

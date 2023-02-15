@@ -1,9 +1,8 @@
 package groupwork.web.controllers;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import groupwork.dto.GenreDTO;
-import groupwork.dto.GenreDTOFromDB;
-import groupwork.dto.GenreDTOFromDBWithoutVersion;
+import groupwork.dto.GenreDTOFull;
+import groupwork.dto.GenreDTOBrief;
 import groupwork.service.api.IGenreService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -20,12 +19,12 @@ public class GenreController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public List<GenreDTOFromDBWithoutVersion> getAll() {
+    public List<GenreDTOBrief> getAll() {
         return genreService.get();
     }
 
     @RequestMapping(path = "/{id}", method = RequestMethod.GET)
-    public GenreDTOFromDB getCard(@PathVariable("id") Long genreID) {
+    public GenreDTOFull getCard(@PathVariable("id") Long genreID) {
         return genreService.get(genreID);
     }
 

@@ -16,42 +16,42 @@
 
         <mvc:annotation-driven/>
 
-    <bean id="manager" class="groupwork.dao.db.orm.manager.Manager"/>
+        <bean id="manager" class="groupwork.dao.orm.manager.Manager"/>
 
-    <bean id="genreService" class="groupwork.service.GenreService">
+        <bean id="genreService" class="groupwork.service.GenreService">
         <constructor-arg index="0" ref="genreDao"/>
-    </bean>
+        </bean>
 
-    <bean id="genreDao" class="groupwork.dao.db.GenreDaoDB">
+        <bean id="genreDao" class="groupwork.dao.db.GenreDaoDB">
         <constructor-arg index="0" ref="manager"/>
-    </bean>
+        </bean>
 
-    <bean id="singerService" class="groupwork.service.SingerService">
+        <bean id="singerService" class="groupwork.service.SingerService">
         <constructor-arg index="0" ref="singerDao"/>
-    </bean>
+        </bean>
 
-    <bean id="singerDao" class="groupwork.dao.db.SingerDaoDB">
+        <bean id="singerDao" class="groupwork.dao.db.SingerDaoDB">
         <constructor-arg index="0" ref="manager"/>
-    </bean>
+        </bean>
 
-    <bean id="voteService" class="groupwork.service.VoteService">
+        <bean id="voteService" class="groupwork.service.VoteService">
         <constructor-arg index="0" ref="votingDao"/>
         <constructor-arg index="1" ref="singerService"/>
         <constructor-arg index="2" ref="genreService"/>
-    </bean>
+        </bean>
 
-    <bean id="votingDao" class="groupwork.dao.db.VotingDaoDB">
+        <bean id="votingDao" class="groupwork.dao.db.VotingDaoDB">
         <constructor-arg index="0" ref="manager"/>
-    </bean>
+        </bean>
 
-    <bean id="statisticService" class="groupwork.service.StatisticsService">
+        <bean id="statisticService" class="groupwork.service.StatisticsService">
         <constructor-arg index="0" ref="voteService"/>
         <constructor-arg index="1" ref="singerService"/>
         <constructor-arg index="2" ref="genreService"/>
-    </bean>
+        </bean>
 
-    <bean id="exceptionHandler" class="groupwork.exception.GlobalExceptionHandler"/>
+        <bean id="exceptionHandler" class="groupwork.exception.GlobalExceptionHandler"/>
     
 
-</beans>
+    </beans>
 

@@ -1,8 +1,8 @@
 package groupwork.web.controllers;
 
 import groupwork.dto.SingerDTO;
-import groupwork.dto.SingerDTOFromDB;
-import groupwork.dto.SingerDTOFromDBWithoutVersion;
+import groupwork.dto.SingerDTOFull;
+import groupwork.dto.SingerDTOBrief;
 import groupwork.service.api.ISingerService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -19,12 +19,12 @@ public class SingerController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public List<SingerDTOFromDBWithoutVersion> getAll() {
+    public List<SingerDTOBrief> getAll() {
         return singerService.get();
     }
 
     @RequestMapping(path = "/{id}", method = RequestMethod.GET)
-    public SingerDTOFromDB getCard(@PathVariable("id") Long singerID){
+    public SingerDTOFull getCard(@PathVariable("id") Long singerID){
         return singerService.get(singerID);
     }
 
