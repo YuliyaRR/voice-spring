@@ -2,12 +2,12 @@ package groupwork.dto;
 
 import java.util.Objects;
 
-public class GenreDTOFromDB {
+public class GenreDTOFull {
     private String name;
     private Long id;
     private Long version;
 
-    public GenreDTOFromDB(String name, Long id, Long version) {
+    public GenreDTOFull(String name, Long id, Long version) {
         this.name = name;
         this.id = id;
         this.version = version;
@@ -29,7 +29,7 @@ public class GenreDTOFromDB {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        GenreDTOFromDB that = (GenreDTOFromDB) o;
+        GenreDTOFull that = (GenreDTOFull) o;
         return Objects.equals(name, that.name) && Objects.equals(id, that.id) && Objects.equals(version, that.version);
     }
 

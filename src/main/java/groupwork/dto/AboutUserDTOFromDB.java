@@ -7,8 +7,10 @@ import java.util.Objects;
 
 public class AboutUserDTOFromDB {
     private String aboutUser;
+
     @JsonFormat(pattern = "HH:mm:ss dd-MM-yyyy", shape = JsonFormat.Shape.STRING)
     private LocalDateTime creationTime;
+
     public AboutUserDTOFromDB(String aboutUser, LocalDateTime creationTime) {
         this.aboutUser = aboutUser;
         this.creationTime = creationTime;

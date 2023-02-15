@@ -8,12 +8,6 @@ public class VoiceDTO {
     private Long[] genre;
     private String message;
 
-    public VoiceDTO(Long singer, Long[] genre, String message) {
-        this.singer = singer;
-        this.genre = genre;
-        this.message = message;
-    }
-
     public VoiceDTO() {
     }
 

@@ -7,9 +7,6 @@ public class ResponseError {
     private HttpStatus status;
     private int statusCode;
 
-    public ResponseError() {
-    }
-
     public ResponseError(String message, HttpStatus status) {
         this.message = message;
         this.status = status;
@@ -39,4 +36,5 @@ public class ResponseError {
     public void setStatusCode(int statusCode) {
         this.statusCode = statusCode;
     }
+
 }

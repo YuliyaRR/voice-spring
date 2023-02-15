@@ -4,23 +4,23 @@ import java.util.List;
 
 public class AllStatisticDTO {
 
-    private final List<VoteCounterRaw<SingerDTOFromDBWithoutVersion>> singers;
-    private final List<VoteCounterRaw<GenreDTOFromDBWithoutVersion>> genres;
+    private final List<VoteCounterRaw<SingerDTOBrief>> singers;
+    private final List<VoteCounterRaw<GenreDTOBrief>> genres;
     private final List<AboutUserDTOFromDB> aboutUsers;
 
-    public AllStatisticDTO(List<VoteCounterRaw<SingerDTOFromDBWithoutVersion>> singers,
-                           List<VoteCounterRaw<GenreDTOFromDBWithoutVersion>> genres,
+    public AllStatisticDTO(List<VoteCounterRaw<SingerDTOBrief>> singers,
+                           List<VoteCounterRaw<GenreDTOBrief>> genres,
                            List<AboutUserDTOFromDB> aboutUsers) {
         this.singers = singers;
         this.genres = genres;
         this.aboutUsers = aboutUsers;
     }
 
-    public List<VoteCounterRaw<SingerDTOFromDBWithoutVersion>> getSingers() {
+    public List<VoteCounterRaw<SingerDTOBrief>> getSingers() {
         return singers;
     }
 
-    public List<VoteCounterRaw<GenreDTOFromDBWithoutVersion>> getGenres() {
+    public List<VoteCounterRaw<GenreDTOBrief>> getGenres() {
         return genres;
     }
 

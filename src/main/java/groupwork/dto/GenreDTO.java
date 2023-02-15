@@ -5,10 +5,6 @@ import java.util.Objects;
 public class GenreDTO {
     private String name;
 
-    public GenreDTO(String name) {
-        this.name = name;
-    }
-
     public GenreDTO() {
     }
 

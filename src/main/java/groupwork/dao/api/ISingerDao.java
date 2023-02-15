@@ -5,7 +5,7 @@ import groupwork.entity.SingerEntity;
 import java.util.List;
 
 public interface ISingerDao {
-    List<SingerEntity> getSingerList();
+    List<SingerEntity> getAll();
 
     boolean isContain(Long id);
 

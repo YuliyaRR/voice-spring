@@ -2,15 +2,14 @@ package groupwork.dto;
 
 import java.util.Objects;
 
-public class SingerDTOFromDBWithoutVersion {
+public class GenreDTOBrief {
     private String name;
     private Long id;
 
-    public SingerDTOFromDBWithoutVersion(String name, Long id) {
+    public GenreDTOBrief(String name, Long id) {
         this.name = name;
         this.id = id;
     }
-
     public String getName() {
         return name;
     }
@@ -23,7 +22,7 @@ public class SingerDTOFromDBWithoutVersion {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        SingerDTOFromDBWithoutVersion that = (SingerDTOFromDBWithoutVersion) o;
+        GenreDTOBrief that = (GenreDTOBrief) o;
         return Objects.equals(name, that.name) && Objects.equals(id, that.id);
     }
 

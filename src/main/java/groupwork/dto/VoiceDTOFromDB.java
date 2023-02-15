@@ -33,16 +33,6 @@ public class VoiceDTOFromDB {
         return dtCreate;
     }
 
-    @Override
-    public String toString() {
-        return "VoiceDTOFromDB{" +
-                "singerID=" + singerID +
-                ", genresID=" + genresID +
-                ", message='" + message + '\'' +
-                ", dtCreate=" + dtCreate +
-                '}';
-    }
-
 
     public static class VoiceDTOFromDBBuilder {
         private Long singer;
