@@ -26,7 +26,8 @@ public class VoiceEntity {
 
     private String message;
 
-    private LocalDateTime time;
+    @Column(name = "dt_create")
+    private LocalDateTime dtCreate;
 
     public VoiceEntity() {
     }
@@ -35,9 +36,8 @@ public class VoiceEntity {
         this.singer = singer;
         this.genres = genres;
         this.message = message;
-        this.time = LocalDateTime.now();
+        this.dtCreate = LocalDateTime.now();
     }
-
 
     public Long getId() {
         return id;
@@ -55,8 +55,7 @@ public class VoiceEntity {
         return message;
     }
 
-    public LocalDateTime getTime() {
-        return time;
+    public LocalDateTime getDtCreate() {
+        return dtCreate;
     }
-
 }
