@@ -1,21 +1,16 @@
 package groupwork.dao.db;
 
-
 import groupwork.dao.api.IGenreDao;
-import groupwork.dao.db.orm.api.IManager;
+import groupwork.dao.orm.api.IManager;
 import groupwork.entity.GenreEntity;
 import groupwork.exception.ConnectionDataBaseException;
 import groupwork.exception.NotFoundDataBaseException;
 
 import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 import java.util.List;
 
 public class GenreDaoDB implements IGenreDao {
-    private IManager manager;
+    private final IManager manager;
 
     public GenreDaoDB(IManager manager) {
         this.manager = manager;
@@ -33,7 +28,10 @@ public class GenreDaoDB implements IGenreDao {
 
             return resultList;
 
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
+            if(entityManager != null && entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
             throw new ConnectionDataBaseException("Database connection error", e);
         } finally {
             if(entityManager != null) {
@@ -53,7 +51,10 @@ public class GenreDaoDB implements IGenreDao {
 
             return genreEntity != null;
 
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
+            if(entityManager != null && entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
             throw new ConnectionDataBaseException("Database connection error", e);
         } finally {
             if(entityManager != null) {
@@ -65,26 +66,28 @@ public class GenreDaoDB implements IGenreDao {
     @Override
     public void delete(GenreEntity genreEntity) {
         Long id = genreEntity.getId();
-        Long version = genreEntity.getVersion();
         EntityManager entityManager = null;
         try {
             entityManager = manager.getEntityManager();
             entityManager.getTransaction().begin();
             GenreEntity genreEntityDB = entityManager.find(GenreEntity.class, id);
 
-            if(genreEntityDB != null && genreEntityDB.getVersion().equals(version)) {
+            if (genreEntityDB != null) {
                 entityManager.remove(genreEntityDB);
                 entityManager.getTransaction().commit();
             } else {
+                if(entityManager.getTransaction().isActive()) {
+                    entityManager.getTransaction().rollback();
+                }
+                throw new NotFoundDataBaseException("Delete is not possible. The genre wasn't found in the database");
+            }
+        } catch (NotFoundDataBaseException e) {
+            throw e;
+        } catch (Exception e) {
+            if(entityManager != null && entityManager.getTransaction().isActive()) {
                 entityManager.getTransaction().rollback();
-                throw new NullPointerException("Delete is not possible. The genre wasn't found in the database");
             }
-        } catch (RuntimeException e) {
-            if(e instanceof NullPointerException) {
-                throw new NotFoundDataBaseException(e.getMessage());
-            } else {
-                throw new ConnectionDataBaseException("Database connection error", e);
-            }
+            throw new ConnectionDataBaseException("Database connection error", e);
         } finally {
             if(entityManager != null) {
                 entityManager.close();
@@ -100,7 +103,10 @@ public class GenreDaoDB implements IGenreDao {
             entityManager.getTransaction().begin();
             entityManager.persist(genreEntity);
             entityManager.getTransaction().commit();
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
+            if(entityManager != null && entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
             throw new ConnectionDataBaseException("Database connection error", e);
         } finally {
             if(entityManager != null) {
@@ -112,7 +118,6 @@ public class GenreDaoDB implements IGenreDao {
     @Override
     public void update(GenreEntity genreEntity) {
         Long id = genreEntity.getId();
-        Long version = genreEntity.getVersion();
         EntityManager entityManager = null;
         try {
             entityManager = manager.getEntityManager();
@@ -120,19 +125,22 @@ public class GenreDaoDB implements IGenreDao {
 
             GenreEntity genreEntityDB = entityManager.find(GenreEntity.class, id);
 
-            if (genreEntityDB != null && genreEntityDB.getVersion().equals(version)) {
+            if (genreEntityDB != null) {
                 entityManager.merge(genreEntity);
                 entityManager.getTransaction().commit();
             } else {
+                if(entityManager.getTransaction().isActive()) {
+                    entityManager.getTransaction().rollback();
+                }
+                throw new NotFoundDataBaseException("Update is not possible. The genre wasn't found in the database");
+            }
+        } catch (NotFoundDataBaseException e) {
+            throw e;
+        } catch (Exception e) {
+            if(entityManager != null && entityManager.getTransaction().isActive()) {
                 entityManager.getTransaction().rollback();
-                throw new NullPointerException("Update is not possible. The genre wasn't found in the database");
             }
-        } catch (RuntimeException e) {
-            if(e instanceof NullPointerException) {
-                throw new NotFoundDataBaseException(e.getMessage());
-            } else {
-                throw new ConnectionDataBaseException("Database connection error", e);
-            }
+            throw new ConnectionDataBaseException("Database connection error", e);
         } finally {
             if (entityManager != null) {
                 entityManager.close();
@@ -149,19 +157,13 @@ public class GenreDaoDB implements IGenreDao {
             GenreEntity genreEntity = entityManager.find(GenreEntity.class, id);
             entityManager.getTransaction().commit();
 
-            if (genreEntity != null) {
+            return genreEntity;
 
-                return genreEntity;
-
-            } else {
-                throw new NullPointerException("The genre wasn't found in the database");
+        } catch (Exception e) {
+            if(entityManager != null && entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
             }
-        } catch (RuntimeException e) {
-            if(e instanceof NullPointerException) {
-                throw new NotFoundDataBaseException(e.getMessage());
-            } else {
-                throw new ConnectionDataBaseException("Database connection error", e);
-            }
+            throw new ConnectionDataBaseException("Database connection error", e);
         } finally {
             if (entityManager != null) {
                 entityManager.close();

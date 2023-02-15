@@ -1,12 +1,13 @@
 package groupwork.dao.db;
 
 import groupwork.dao.api.IVotingDao;
-import groupwork.dao.db.orm.api.IManager;
+import groupwork.dao.orm.api.IManager;
 import groupwork.entity.VoiceEntity;
 import groupwork.exception.ConnectionDataBaseException;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+
 
 public class VotingDaoDB implements IVotingDao {
     private final IManager manager;
@@ -17,17 +18,21 @@ public class VotingDaoDB implements IVotingDao {
 
 
     @Override
-    public List<VoiceEntity> getVoiceList() {
+    public List<VoiceEntity> getVoices() {
         EntityManager entityManager = null;
         try {
             entityManager = manager.getEntityManager();
             entityManager.getTransaction().begin();
-            List<VoiceEntity> resultList = entityManager.createQuery("from VoiceEntity", VoiceEntity.class).getResultList();
+            List<VoiceEntity> result = entityManager.createQuery("from VoiceEntity", VoiceEntity.class)
+                    .getResultList();
             entityManager.getTransaction().commit();
 
-            return resultList;
+            return result;
 
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
+            if(entityManager != null && entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
             throw new ConnectionDataBaseException("Database connection error", e);
         } finally {
             if(entityManager != null) {
@@ -45,7 +50,10 @@ public class VotingDaoDB implements IVotingDao {
             entityManager.getTransaction().begin();
             entityManager.persist(voice);
             entityManager.getTransaction().commit();
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
+            if(entityManager != null && entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
             throw new ConnectionDataBaseException("Database connection error", e);
         } finally {
             if(entityManager != null) {
