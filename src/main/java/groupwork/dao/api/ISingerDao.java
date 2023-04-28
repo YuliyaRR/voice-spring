@@ -9,7 +9,7 @@ public interface ISingerDao {
 
     boolean isContain(Long id);
 
-    void delete(SingerEntity singerEntity);
+    void delete(Long id, Long version);
 
     void create(SingerEntity singerEntity);
 
