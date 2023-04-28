@@ -41,11 +41,7 @@ public class SingerService implements ISingerService {
         SingerEntity singerEntityDB = dao.get(id);
 
         if(singerEntityDB != null) {
-            if(singerEntityDB.getVersion().equals(version)) {
-                dao.delete(new SingerEntity(id, version));
-            } else {
-                throw new InvalidInputServiceException("Singer's version is invalid");
-            }
+            dao.delete(id, version);
         } else {
             throw new InvalidInputServiceException("Singer with this id was not found in the database");
         }
