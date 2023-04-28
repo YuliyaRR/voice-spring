@@ -50,7 +50,7 @@
         <constructor-arg index="2" ref="genreService"/>
         </bean>
 
-        <bean id="exceptionHandler" class="groupwork.exception.GlobalExceptionHandler"/>
+        <bean id="exceptionHandler" class="groupwork.web.controllers.GlobalExceptionHandler"/>
     
 
     </beans>
