@@ -10,7 +10,7 @@ public interface IGenreDao {
 
     boolean isContain(Long id);
 
-    void delete(GenreEntity genreEntity);
+    void delete(Long id, Long version);
 
     void create(GenreEntity genreEntity);
 
