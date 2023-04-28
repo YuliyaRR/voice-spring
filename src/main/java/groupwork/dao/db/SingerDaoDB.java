@@ -62,24 +62,23 @@ public class SingerDaoDB implements ISingerDao {
     }
 
     @Override
-    public void delete(SingerEntity singerEntity) {
-        Long id = singerEntity.getId();
+    public void delete(Long id, Long version) {
         EntityManager entityManager = null;
         try {
             entityManager = manager.getEntityManager();
             entityManager.getTransaction().begin();
             SingerEntity singerEntityDB = entityManager.find(SingerEntity.class, id);
 
-            if(singerEntityDB != null) {
+            if(singerEntityDB != null && singerEntityDB.getVersion().equals(version)) {
                 entityManager.remove(singerEntityDB);
                 entityManager.getTransaction().commit();
             } else {
-                if(entityManager.getTransaction().isActive()) {
-                    entityManager.getTransaction().rollback();
-                }
                 throw new NotFoundDataBaseException("Delete is not possible. The singer wasn't found in the database");
             }
         } catch (NotFoundDataBaseException e) {
+            if(entityManager != null && entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
             throw e;
         } catch (Exception e) {
             if(entityManager != null && entityManager.getTransaction().isActive()) {
@@ -127,12 +126,12 @@ public class SingerDaoDB implements ISingerDao {
                 entityManager.merge(singerEntity);
                 entityManager.getTransaction().commit();
             } else {
-                if(entityManager.getTransaction().isActive()) {
-                    entityManager.getTransaction().rollback();
-                }
                 throw new NotFoundDataBaseException("Update is not possible. The singer wasn't found in the database");
             }
         } catch (NotFoundDataBaseException e) {
+            if(entityManager != null && entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
             throw e;
         } catch (Exception e) {
             if(entityManager != null && entityManager.getTransaction().isActive()) {
