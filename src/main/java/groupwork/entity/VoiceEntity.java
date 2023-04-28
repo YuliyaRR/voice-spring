@@ -14,7 +14,7 @@ public class VoiceEntity {
     @GenericGenerator(name = "increment", strategy = "increment")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinTable(name = "app.votes_singer",
             joinColumns = @JoinColumn(name = "vote_id"))
     private SingerEntity singer;
