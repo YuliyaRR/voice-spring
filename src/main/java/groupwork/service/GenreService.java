@@ -40,11 +40,7 @@ public class GenreService implements IGenreService {
     public void delete(Long id, Long version) {
         GenreEntity genreEntityDB = dao.get(id);
         if (genreEntityDB != null) {
-            if (genreEntityDB.getVersion().equals(version)) {
-                dao.delete(genreEntityDB);
-            } else {
-                throw new InvalidInputServiceException("This version genre was changed or was deleted yet");
-            }
+            dao.delete(id, version);
         } else {
             throw new InvalidInputServiceException("Genre with this id was not found in the database");
         }
